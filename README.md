@@ -411,7 +411,7 @@ Planned features and improvements:
 
 ## 👋 Contact
 
-Built with ❤️ by [**Rajan Bansal**](https://www.linkedin.com/in/rajanbansal553/)  
+Built with ❤️ by [**Simarjeet**](https://www.linkedin.com/in/simarjeetofficial/)  
 📫 Let’s connect if you’re hiring, collaborating, or just passionate about distributed systems, backend engineering, or DevOps.
 
 ---
