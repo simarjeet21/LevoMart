@@ -1,0 +1,71 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/test-client"
+  
+}
+
+// datasource db {
+//   provider = "postgresql"
+//   url      = env("DATABASE_URL")
+// }
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL_TEST") // Use a different database for testing
+}
+enum OrderStatus {
+  CREATED
+  PENDING
+  COMPLETED
+  CANCELLED
+  AWAITING_PAYMENT
+}
+
+model OrderItem {
+  id         String   @id @default(uuid())
+  orderId    String
+  order     Order    @relation(fields: [orderId], references: [id])
+  // denormalized fields to avoid joins
+  productId          String
+  productName        String
+  productPrice       Float
+  quantity  Int
+  sellerId  String
+  totalPrice Float
+  version    Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("order_items")
+}
+
+model Order {
+  id         String       @id @default(uuid())
+  userId     String
+  status      OrderStatus  @default(CREATED)
+  expiresAt   DateTime?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  version    Int          @default(0)
+  orderItems OrderItem[]
+
+  @@map("orders")
+}
+
+model Product {
+  id          String   @id 
+  name        String
+  price       Float
+  userId    String
+  version     Int           @default(0)
+  updatedAt   DateTime     @updatedAt
+  createdAt   DateTime     @default(now())
+
+  @@map("products")
+}

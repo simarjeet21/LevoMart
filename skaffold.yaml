@@ -1,0 +1,157 @@
+apiVersion: skaffold/v4beta13
+kind: Config
+metadata:
+  name: levomart-platform
+build:
+  local:
+    push: false
+  artifacts:
+    - image: auth
+      context: auth
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - src: "target/classes/**"
+            dest: /app/target/classes
+          - src: "src/main/resources/**"
+            dest: /app/src/main/resources
+    - image: cart
+      context: cart
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - src: "target/classes/**"
+            dest: /app/target/classes
+          - src: "src/main/resources/**"
+            dest: /app/src/main/resources
+    - image: payment
+      context: payment
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - src: "target/classes/**"
+            dest: /app/target/classes
+          - src: "src/main/resources/**"
+            dest: /app/src/main/resources
+    - image: product
+      context: product
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - src: "src/**/*.ts"
+            dest: .
+    - image: order
+      context: orders
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - src: "src/**/*.ts"
+            dest: .
+    - image: client
+      context: client
+      docker:
+        dockerfile: Dockerfile
+
+manifests:
+  rawYaml:
+    # AUTH
+    - k8s/auth/auth-postgres-deployment.yaml
+    - k8s/auth/auth-service-deployment.yaml
+    - k8s/auth/auth-configmap.yaml
+    - k8s/auth/auth-secret.yaml
+
+    # CART
+    - k8s/cart/cart-redis-deployment.yaml
+    - k8s/cart/cart-service-deployment.yaml
+    - k8s/cart/cart-configmap.yaml
+    - k8s/cart/cart-secret.yaml
+
+    # PAYMENT
+    - k8s/payment/payment-postgres-deployment.yaml
+    - k8s/payment/payment-service-deployment.yaml
+    - k8s/payment/payment-configmap.yaml
+    - k8s/payment/payment-secret.yaml
+
+    # PRODUCT
+    - k8s/product/product-mongo-deployment.yaml
+    - k8s/product/product-service-deployment.yaml
+    - k8s/product/product-configmap.yaml
+    - k8s/product/product-secret.yaml
+
+    # ORDERS
+    - k8s/orders/order-postgres-deployment.yaml
+    - k8s/orders/order-service-deployment.yaml
+    - k8s/orders/order-configmap.yaml
+    - k8s/orders/order-secret.yaml
+    - k8s/orders/order-migrate-job.yaml
+
+    # INFRA
+    - k8s/kafka-deployment.yaml
+    - k8s/ingress-service-deployment.yaml
+    - k8s/client-deployment.yaml
+    - k8s/kafka-topic-init-job.yaml
+deploy:
+  kubectl:
+    defaultNamespace: default
+
+portForward:
+  # AUTH
+  - resourceType: service
+    resourceName: auth-service
+    port: 8081
+    localPort: 8081
+  - resourceType: service
+    resourceName: auth-postgres-service
+    port: 5432
+    localPort: 5434
+
+  # CART
+  - resourceType: service
+    resourceName: cart-service
+    port: 8081
+    localPort: 8082
+  - resourceType: service
+    resourceName: cart-redis-service
+    port: 6379
+    localPort: 6379
+
+  # PAYMENT
+  - resourceType: service
+    resourceName: payment-service
+    port: 8081
+    localPort: 8083
+  - resourceType: service
+    resourceName: payment-postgres-service
+    port: 5432
+    localPort: 5435
+
+  # PRODUCT
+  - resourceType: service
+    resourceName: product-service
+    port: 4000
+    localPort: 4000
+  - resourceType: service
+    resourceName: product-mongo-service
+    port: 27017
+    localPort: 27018
+
+  # ORDER
+  - resourceType: service
+    resourceName: order-service
+    port: 4000
+    localPort: 4001
+  - resourceType: service
+    resourceName: order-postgres-service
+    port: 5432
+    localPort: 5436
+
+  # KAFKA
+  - resourceType: service
+    resourceName: kafka-broker
+    port: 9092
+    localPort: 9092

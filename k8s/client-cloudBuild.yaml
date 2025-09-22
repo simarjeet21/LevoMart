@@ -1,0 +1,35 @@
+# steps:
+#   # Build & push client
+#   - name: "gcr.io/cloud-builders/docker"
+#     args:
+#       [
+#         "build",
+#         "-t",
+#         "asia-south1-docker.pkg.dev/levomart/levomart-repo/client:latest",
+#         "./client",
+#       ]
+#   - name: "gcr.io/cloud-builders/docker"
+#     args:
+#       [
+#         "push",
+#         "asia-south1-docker.pkg.dev/levomart/levomart-repo/client:latest",
+#       ]
+
+# images:
+#   - "asia-south1-docker.pkg.dev/levomart/levomart-repo/client:latest"
+steps:
+  - name: gcr.io/cloud-builders/docker
+
+    args:
+      - build
+      - -t
+      - asia-south1-docker.pkg.dev/levomart/levomart-repo/client:latest
+      - .
+
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - push
+      - asia-south1-docker.pkg.dev/levomart/levomart-repo/client:latest
+
+images:
+  - asia-south1-docker.pkg.dev/levomart/levomart-repo/client:latest

@@ -1,0 +1,112 @@
+# Java
+**/target/
+**/.classpath
+**/.project
+**/.settings/
+**/.idea/
+**/.mvn/
+**/build/
+*.iml
+
+# Node.js
+**/node_modules/
+**/npm-debug.log
+**/yarn-debug.log
+**/yarn-error.log
+**/dist/
+**/.env
+**/.env.*
+
+# OS generated
+.DS_Store
+Thumbs.db
+
+# Logs
+**/logs/
+*.log
+
+# Test output
+**/coverage/
+**/test-results/
+
+# Docker
+**/.docker/
+**/docker-compose.override.yml
+
+# VSCode
+.vscode/
+
+# Misc
+*.swp
+*.swo
+
+
+
+dump/
+# ============================
+# ✅ KUBERNETES
+# ============================
+
+# Ignore all K8s secret files in any directory
+**/*secret*.yaml
+
+# Ignore all config values files you might not want in Git
+**/*config*.local.yaml
+**/*config*.dev.yaml
+**/*config*.prod.yaml
+
+# Optional Skaffold-related files/folders
+skaffold-output/
+.skaffold/
+
+# ============================
+# ✅ ENV + Secrets
+# ============================
+
+# Env files (already present, reaffirming)
+**/.env
+**/.env.*
+**/*env*.yml
+**/*env*.yaml
+
+# Sample envs are fine
+!**/.env.sample
+!**/env.sample.yaml
+
+# ============================
+# ✅ IDE & Misc Cleanup
+# ============================
+
+# JetBrains IDEs (IntelliJ/WebStorm etc.)
+**/.idea/
+*.iml
+
+# VSCode (already present, reaffirming)
+.vscode/
+
+# Backup & swap files
+*.swp
+*.swo
+*~
+
+# OSX/Windows noise (already present)
+.DS_Store
+Thumbs.db
+
+# Logs (already present, expanding)
+*.log
+**/logs/
+logs/
+
+# Test Coverage (already present)
+coverage/
+test-results/
+**/coverage/
+**/test-results/
+
+# Build output
+**/target/
+**/build/
+**/dist/
+githubrbac.yaml
+!auth/target/auth-0.0.1-SNAPSHOT.jar

@@ -1,0 +1,32 @@
+# steps:
+#   # Build & push auth
+#   - name: "gcr.io/cloud-builders/docker"
+#     args:
+#       [
+#         "build",
+#         "-t",
+#         "asia-south1-docker.pkg.dev/levomart/levomart-repo/auth:latest",
+#         "./auth",
+#       ]
+#   - name: "gcr.io/cloud-builders/docker"
+#     args:
+#       ["push", "asia-south1-docker.pkg.dev/levomart/levomart-repo/auth:latest"]
+
+# images:
+#   - "asia-south1-docker.pkg.dev/levomart/levomart-repo/auth:latest"
+steps:
+  - name: gcr.io/cloud-builders/docker
+
+    args:
+      - build
+      - -t
+      - asia-south1-docker.pkg.dev/levomart/levomart-repo/auth:latest
+      - .
+
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - push
+      - asia-south1-docker.pkg.dev/levomart/levomart-repo/auth:latest
+
+images:
+  - asia-south1-docker.pkg.dev/levomart/levomart-repo/auth:latest

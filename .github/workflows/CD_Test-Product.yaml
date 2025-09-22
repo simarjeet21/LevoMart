@@ -1,0 +1,105 @@
+name: Product Service CI/CD - Test Branch
+
+on:
+  pull_request:
+    branches: [test]
+    paths: ["product/**"]
+
+jobs:
+  build-and-cloudbuild:
+    name: Build & Push with Google Cloud Build
+    runs-on: ubuntu-latest
+    env:
+      JWT_KEY: "TmV3U2VjcmV0S2V5Rm9ySldUU2lnbmluZ1B1cnBvc2VzMTIzNDU2Nzg="
+      KAFKA_CLIENT_ID: "product-service"
+      KAFKA_BROKERS_ADDRESS: "localhost:9092"
+      KAFKA_TOPIC_PRODUCT_CREATED_SCHEMA_PATH: "../../../shared-schemas/product/product-created.schema.json"
+      KAFKA_TOPIC_PRODUCT_UPDATED_SCHEMA_PATH: "../../../shared-schemas/product/product-updated.schema.json"
+      KAFKA_TOPIC_ORDER_CREATED_SCHEMA_PATH: "../../../shared-schemas/order/order-created.schema.json"
+      KAFKA_TOPIC_ORDER_UPDATED_SCHEMA_PATH: "../../../shared-schemas/order/order-updated.schema.json"
+      PORT: 4000
+      NODE_ENV: "test"
+      KAFKAJS_NO_PARTITIONER_WARNING: 1
+
+    defaults:
+      run:
+        working-directory: product
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: product/package-lock.json
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Run Tests
+        run: npm run test:ci
+
+      - name: Set up Google Cloud CLI
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: "${{ secrets.GCP_SA_KEY }}"
+
+      - name: Set up gcloud CLI
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: levomart
+
+      - name: Extract short SHA
+        id: vars
+        run: echo "SHORT_SHA=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+
+      - name: Submit Cloud Build (Async)
+        id: cloudbuild
+        run: |
+          BUILD_ID=$(gcloud builds submit \
+            --project=levomart \
+            --config=../k8s/product/cloudBuild.yaml \
+            --async \
+            --format='value(metadata.build.id)')
+      - name: Echo Done
+        run: echo "Done with product Service CI/CD for Test Branch"
+#   echo "🔍 Raw Build Output:"
+# BUILD_OUTPUT=$(gcloud builds log $BUILD_ID --project=levomart)
+
+# - name: Wait for Cloud Build to Finish
+#   run: |
+#     echo "⏳ Waiting for build $BUILD_ID to complete..."
+
+#     for i in {1..60}; do
+#       STATUS=$(gcloud builds describe $BUILD_ID --project=levomart --format='value(status)')
+#       echo "🔁 Build status: $STATUS"
+
+#       if [[ "$STATUS" == "SUCCESS" ]]; then
+#         echo "✅ Build succeeded!"
+#         exit 0
+#       elif [[ "$STATUS" == "FAILURE" || "$STATUS" == "CANCELLED" || "$STATUS" == "TIMEOUT" ]]; then
+#         echo "❌ Build failed with status: $STATUS"
+#         exit 1
+#       fi
+
+#       echo "⏱ Sleeping for 20 seconds..."
+#       sleep 20
+#     done
+
+#     echo "❌ Timed out waiting for build to finish."
+#     exit 1
+
+# - name: Submit Cloud Build using external file
+#   run: |
+#     gcloud builds submit \
+#       --project=levomart \
+#       --config=../k8s/product/cloudBuild.yaml
+
+# - name: Submit Cloud Build
+#   run: |
+#     gcloud builds submit auth \
+#       --tag=asia-south1-docker.pkg.dev/levomart/levomart-repo/auth:$SHORT_SHA \
+#       --project=levomart

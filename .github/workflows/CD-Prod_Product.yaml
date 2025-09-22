@@ -1,0 +1,45 @@
+name: Product Service CI/CD - Production
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "product/**"
+
+jobs:
+  deploy-to-gke:
+    name: Deploy Product to GKE
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up GCP Auth
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Set up gcloud CLI
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: levomart
+
+      - name: Install gke-gcloud-auth-plugin
+        run: |
+          gcloud components install gke-gcloud-auth-plugin --quiet
+
+      - name: Configure Kubeconfig
+        run: |
+          gcloud container clusters get-credentials levomart-prod-cluster \
+            --zone asia-south1 \
+            --project levomart
+
+      - name: Deploy to GKE
+        run: |
+          kubectl apply -f k8s/prod/product
+
+      # - name: Verify Rollout
+      #   run: |
+      #     kubectl rollout status deployment/product

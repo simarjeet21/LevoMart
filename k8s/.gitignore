@@ -1,0 +1,15 @@
+# Ignore all secret files across all services
+**/*secret*.yaml
+
+# Ignore backup or temp files
+**/*.bak
+**/*~
+**/*.swp
+
+# Ignore Skaffold-specific Kubernetes manifest outputs (optional)
+skaffold-output/
+# Generated K8s manifests (if any)
+**/*-generated.yaml
+
+# Logs
+**/*.log

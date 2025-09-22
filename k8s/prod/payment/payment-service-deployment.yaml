@@ -1,0 +1,98 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: payment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: payment
+  template:
+    metadata:
+      labels:
+        app: payment
+    spec:
+      containers:
+        - name: payment-container
+          image: asia-south1-docker.pkg.dev/levomart/levomart-repo/payment:latest # Skaffold will tag this
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "256Mi"
+            limits:
+              cpu: "300m"
+              memory: "512Mi"
+          ports:
+            - containerPort: 8081
+          env:
+            # --- Database ---
+            - name: DB_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: payment-config
+                  key: DB_URL
+
+            - name: DB_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: payment-config
+                  key: DB_USER
+
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: payment-secret
+                  key: DB_PASSWORD
+
+            # --- Stripe ---
+            - name: STRIPE_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: payment-secret
+                  key: STRIPE_SECRET_KEY
+
+            - name: WEBHOOK_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: payment-secret
+                  key: WEBHOOK_SECRET_KEY
+
+            - name: CHECKOUT_SUCCESS_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: payment-config
+                  key: CHECKOUT_SUCCESS_URL
+
+            - name: CHECKOUT_CANCEL_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: payment-config
+                  key: CHECKOUT_CANCEL_URL
+
+            # --- JWT ---
+            - name: JWT_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: payment-secret
+                  key: JWT_KEY
+
+            # --- Kafka ---
+            - name: KAFKA_BROKERS
+              valueFrom:
+                configMapKeyRef:
+                  name: payment-config
+                  key: KAFKA_BROKERS
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: payment-service
+spec:
+  selector:
+    app: payment
+  ports:
+    - name: payment
+      protocol: TCP
+      port: 8081
+      targetPort: 8081

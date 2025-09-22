@@ -1,0 +1,65 @@
+import "./globals.css";
+import { Inter } from "next/font/google";
+
+const inter = Inter({ subsets: ["latin"] });
+
+export const metadata = {
+  title: "MyShop",
+  description: "A minimalist microservices e-commerce frontend",
+};
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en">
+      <body className={inter.className + " bg-brand-secondary text-gray-900"}>
+        {children}
+      </body>
+    </html>
+  );
+}
+
+🔧 Step-by-Step Dev Order
+We'll now follow this order:
+
+1️⃣ Layout (Done partially)
+ Create Navbar with auth-aware options (Login / Logout / Role Pages)
+
+ Create Footer
+
+ Setup global theme (Tailwind config)
+
+2️⃣ Home Page
+ Hero banner / message
+
+ Featured product cards
+
+ Search bar (redirects to /search?q=...)
+
+3️⃣ Products Page
+ Fetch all products with filter (category, price)
+
+ Product cards with image, title, price
+
+ Pagination
+
+4️⃣ Product Detail Page
+ Full detail of product + "Add to Cart" (call cart service)
+
+ Auth-protected (else redirect to login)
+
+5️⃣ Cart Page
+ Show items from cart service (REST call with JWT)
+
+ Quantity update, remove item
+
+ Checkout button → goes to order service
+
+6️⃣ Orders Page
+ Order history (from order service)
+
+ Order detail with Stripe status
+
+7️⃣ Profile Page
+ Email, role, logout button
+
+ If Seller/Admin → redirect or show dashboard options

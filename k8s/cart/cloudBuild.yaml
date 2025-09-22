@@ -1,0 +1,32 @@
+# steps:
+#   # Build & push payment
+#   - name: "gcr.io/cloud-builders/docker"
+#     args:
+#       [
+#         "build",
+#         "-t",
+#         "asia-south1-docker.pkg.dev/levomart/levomart-repo/cart:latest",
+#         "./cart",
+#       ]
+#   - name: "gcr.io/cloud-builders/docker"
+#     args:
+#       ["push", "asia-south1-docker.pkg.dev/levomart/levomart-repo/cart:latest"]
+
+# images:
+#   - "asia-south1-docker.pkg.dev/levomart/levomart-repo/cart:latest"
+steps:
+  - name: gcr.io/cloud-builders/docker
+
+    args:
+      - build
+      - -t
+      - asia-south1-docker.pkg.dev/levomart/levomart-repo/cart:latest
+      - .
+
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - push
+      - asia-south1-docker.pkg.dev/levomart/levomart-repo/cart:latest
+
+images:
+  - asia-south1-docker.pkg.dev/levomart/levomart-repo/cart:latest

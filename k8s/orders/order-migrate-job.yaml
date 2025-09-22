@@ -1,0 +1,24 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: order-migration-job
+spec:
+  template:
+    spec:
+      containers:
+        - name: migrate
+          image: order:latest
+          command:
+            [
+              "npx",
+              "prisma",
+              "migrate",
+              "deploy",
+              "--schema=./prisma/prod/schema.prisma",
+            ]
+          envFrom:
+            - configMapRef:
+                name: order-config
+            - secretRef:
+                name: order-secret
+      restartPolicy: Never

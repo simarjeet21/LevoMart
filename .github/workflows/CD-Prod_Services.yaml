@@ -1,0 +1,50 @@
+name: Service CI/CD - Production
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  deploy-to-gke:
+    name: Deploy services to GKE
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up GCP Auth
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Set up gcloud CLI
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: levomart
+
+      - name: Install gke-gcloud-auth-plugin
+        run: |
+          gcloud components install gke-gcloud-auth-plugin --quiet
+
+      - name: Configure Kubeconfig
+        run: |
+          gcloud container clusters get-credentials levomart-prod-cluster \
+            --zone asia-south1 \
+            --project levomart
+
+      - name: Deploy to GKE
+        run: |
+          kubectl apply -f k8s/prod/ingress-service-deployment.yaml
+          kubectl apply -f k8s/prod/kafka-deployment.yaml
+          kubectl apply -f k8s/prod/kafka-topic-init-job.yaml
+
+      # - name: Verify Rollouts
+      #   run: |
+
+      #     kubectl rollout status deployment/kafka
+      #     kubectl rollout status deployment/ingress
+
+      - name: Echo Done
+        run: echo "✅ Done with Auth Service CI/CD for Production Branch"

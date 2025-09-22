@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: product-mongo-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: product-mongo
+  template:
+    metadata:
+      labels:
+        app: product-mongo
+    spec:
+      containers:
+        - name: product-mongo
+          image: mongo
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "256Mi"
+            limits:
+              cpu: "300m"
+              memory: "512Mi"
+          ports:
+            - containerPort: 27017
+
+          env:
+            - name: MONGO_INITDB_DATABASE
+              value: productdb
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: product-mongo-service
+spec:
+  selector:
+    app: product-mongo
+  ports:
+    - name: db
+      protocol: TCP
+      port: 27017
+      targetPort: 27017

@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: order-config
+data:
+  PORT: "4000"
+  DATABASE_URL: postgresql://postgres:5533@order-postgres-service:5432/order-service
+  TEST_EMAIL: Wd7w9@example.com
+  KAFKA_CLIENT_ID: orders-service
+  KAFKA_BROKERS_ADDRESS: kafka-broker:9092
+  KAFKA_TOPIC_ORDER_CREATED: order-created
+  KAFKA_TOPIC_ORDER_UPDATED: order-updated
+  KAFKA_TOPIC_ORDER_CREATED_SCHEMA_PATH: /app/shared-schemas/order/order-created.schema.json
+  KAFKA_TOPIC_ORDER_UPDATED_SCHEMA_PATH: /app/shared-schemas/order/order-updated.schema.json
+  KAFKA_TOPIC_PRODUCT_UPDATED_SCHEMA_PATH: /app/shared-schemas/product/product-updated.schema.json
+  KAFKA_TOPIC_PRODUCT_CREATED_SCHEMA_PATH: /app/shared-schemas/product/product-created.schema.json
+  KAFKA_TOPIC_PAYMENT_SUCCEEDED_SCHEMA_PATH: /app/shared-schemas/payment/payment-succeeded.schema.json
+  KAFKA_TOPIC_PAYMENT_FAILED_SCHEMA_PATH: /app/shared-schemas/payment/payment-failed.schema.json

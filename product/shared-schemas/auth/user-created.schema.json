@@ -1,0 +1,19 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "UserCreatedEvent",
+  "type": "object",
+  "properties": {
+    "userId": {
+      "type": "string"
+    },
+    "email": {
+      "type": "string",
+      "format": "email"
+    },
+    "role": {
+      "type": "string",
+      "enum": ["USER", "SELLER", "ADMIN"]
+    }
+  },
+  "required": ["userId", "email", "role"]
+}

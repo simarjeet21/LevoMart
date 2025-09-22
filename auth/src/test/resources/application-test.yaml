@@ -1,0 +1,95 @@
+# spring:
+#   datasource:
+#     url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1
+#     driver-class-name: org.h2.Driver
+#     username: sa
+#     password:
+#   jpa:
+#     hibernate:
+#       ddl-auto: create-drop
+#     show-sql: true
+#     properties:
+#       hibernate:
+#         format_sql: true
+#   h2:
+#     console:
+#       enabled: true
+#   kafka:
+#     bootstrap-servers: dummy:1234
+#     producer:
+#       retries: 0
+#     consumer:
+#       group-id: dummy
+#     listener:
+#       missing-topics-fatal: false
+#   autoconfigure:
+#     exclude: org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration
+#   enabled: false
+
+# spring.h2.console.enabled: true
+# spring.h2.console.path: /h2-console
+
+spring:
+  # profiles:
+  #   active: test
+
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+  kafka:
+    enabled: false # This disables all Kafka-related config and beans via @ConditionalOnProperty
+    bootstrap-servers: dummy:1234
+    producer:
+      retries: 0
+    consumer:
+      group-id: dummy
+    listener:
+      missing-topics-fatal: false
+schema:
+  user:
+    created:
+      path: src/test/resources/schemas/dummy/user-created.schema.json
+
+# Exclude Kafka auto-configuration to avoid instantiating Kafka beans during tests
+spring.autoconfigure.exclude:
+  - org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration
+# Topic fallback values (used by UserService even if Kafka is disabled)
+# topic:
+#   user-created: test-user-created
+# Dummy schema file path for JsonSchemaValidator
+
+# Optional logging (uncomment as needed)
+# logging:
+#   level:
+#     root: INFO
+#     org.springframework.security: DEBUG
+#     com.auth.auth: DEBUG
+#     org.springframework.web: DEBUG
+
+# JPA Configuration
+
+# # Logging
+# logging.level.org.springframework.security=DEBUG
+# logging.level.com.auth.auth=DEBUG
+# logging.level.org.springframework.web=DEBUG
+
+# # Disable security for actuator endpoints in tests
+# management.endpoints.web.exposure.include=*
+# management.endpoint.health.show-details=always
+

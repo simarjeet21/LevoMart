@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cart
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cart
+  template:
+    metadata:
+      labels:
+        app: cart
+    spec:
+      containers:
+        - name: cart-container
+          image: cart:latest # Skaffold will tag this
+          ports:
+            - containerPort: 8081
+          env:
+            - name: REDIS_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: cart-config
+                  key: REDIS_HOST
+
+            - name: REDIS_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: cart-config
+                  key: REDIS_PORT
+            - name: KAFKA_BROKERS
+              valueFrom:
+                configMapKeyRef:
+                  name: cart-config
+                  key: KAFKA_BROKERS
+
+            - name: JWT_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: cart-secret
+                  key: JWT_KEY
+          volumeMounts:
+            - name: shared-schemas-volume
+              mountPath: /app/shared-schemas
+      volumes:
+        - name: shared-schemas-volume
+          hostPath:
+            path: /run/desktop/mnt/host/d/projects/op_project_1/shared-schemas
+            type: Directory
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cart-service
+spec:
+  selector:
+    app: cart
+  ports:
+    - name: cart
+      protocol: TCP
+      port: 8081
+      targetPort: 8081

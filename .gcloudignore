@@ -1,0 +1,106 @@
+<!-- # .gcloudignore
+
+# Default ignores
+
+.gcloudignore
+.git
+.gitignore
+
+#!include:.gitignore
+
+# Explicitly include JARs needed for build
+
+!auth/target/auth-0.0.1-SNAPSHOT.jar
+!payment/target/payment-0.0.1-SNAPSHOT.jar
+!cart/target/cart-0.0.1-SNAPSHOT.jar
+!product/target/product-0.0.1-SNAPSHOT.jar
+!client/target/client-0.0.1-SNAPSHOT.jar
+!orders/target/orders-0.0.1-SNAPSHOT.jar -->
+
+# ===========================
+
+# ✅ Include only what you need
+
+# ===========================
+
+# Java: Exclude target, except for compiled JARs
+
+<!-- \*\*/target/ -->
+
+# Node.js
+
+**/node_modules/
+**/dist/
+**/build/
+**/.next/
+\*\*/.nuxt/
+
+# OS and IDE generated files
+
+.DS*Store
+Thumbs.db
+*.log
+.vscode/
+.idea/
+\_.iml
+
+# Env and secrets
+
+**/.env
+**/.env.*
+\*\*/*secret*.yaml
+\*\*/*config*.local.yaml
+\*\*/*config*.dev.yaml
+\*\*/*config\*.prod.yaml
+
+# Docker stuff
+
+**/.docker/
+**/docker-compose.override.yml
+
+# Test outputs
+
+**/coverage/
+**/test-results/
+
+# Skaffold
+
+.skaffold/
+skaffold-output/
+
+# Git
+
+.git
+.gitignore
+
+<!-- # Do NOT include .gitignore files anymore
+
+!include:.gitignore
+!auth/target/auth-0.0.1-SNAPSHOT.jar
+!payment/target/payment-0.0.1-SNAPSHOT.jar
+!cart/target/cart-0.0.1-SNAPSHOT.jar
+!product/target/product-0.0.1-SNAPSHOT.jar
+!client/target/client-0.0.1-SNAPSHOT.jar
+!orders/target/orders-0.0.1-SNAPSHOT.jar -->
+
+# Ignore all target folders
+
+\*\*/target/
+
+# But allow target folders for required services
+
+!auth/target/
+!cart/target/
+!payment/target/
+!product/target/
+!orders/target/
+!client/target/
+
+# Then allow their built JARs explicitly
+
+!auth/target/auth-0.0.1-SNAPSHOT.jar
+!cart/target/cart-0.0.1-SNAPSHOT.jar
+!payment/target/payment-0.0.1-SNAPSHOT.jar
+!product/target/product-0.0.1-SNAPSHOT.jar
+!orders/target/orders-0.0.1-SNAPSHOT.jar
+!client/target/client-0.0.1-SNAPSHOT.jar

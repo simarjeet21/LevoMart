@@ -1,0 +1,102 @@
+name: Auth Service CI/CD - Test Branch
+
+on:
+  # push:
+  #   branches: [test]
+  #   paths: ["auth/**"]
+  pull_request:
+    branches: [test]
+    paths: ["auth/**"]
+
+jobs:
+  build-and-cloudbuild:
+    name: Build & Push with Google Cloud Build
+    runs-on: ubuntu-latest
+    env:
+      DB_URL: jdbc:h2:mem:testdb
+      DB_USER: test_user
+      DB_PASSWORD: test_password
+      KAFKA_BROKERS: localhost:9092
+      JWT_KEY: "TmV3U2VjcmV0S2V5Rm9ySldUU2lnbmluZ1B1cnBvc2VzMTIzNDU2Nzg="
+    defaults:
+      run:
+        working-directory: auth
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Copy shared-schemas into /app folder (for schema path resolution)
+        run: |
+          sudo mkdir -p /app
+          sudo cp -r ../shared-schemas /app/
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: maven
+
+      - name: Build and verify tests
+        run: mvn clean verify -B
+        continue-on-error: false
+
+      - name: Set up Google Cloud CLI
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: "${{ secrets.GCP_SA_KEY }}"
+
+      - name: Set up gcloud CLI
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: levomart
+
+      - name: Extract short SHA
+        id: vars
+        run: echo "SHORT_SHA=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+
+      - name: Submit Cloud Build (Async)
+        id: cloudbuild
+        run: |
+          BUILD_ID=$(gcloud builds submit \
+            --project=levomart \
+            --config=../k8s/auth/cloudBuild.yaml \
+            --async \
+            --format='value(metadata.build.id)')
+
+      # - name: Wait for Cloud Build to Finish
+      #   run: |
+      #     echo "⏳ Waiting for build $BUILD_ID to complete..."
+
+      #     for i in {1..60}; do
+      #       STATUS=$(gcloud builds describe $BUILD_ID --project=levomart --format='value(status)')
+      #       echo "🔁 Build status: $STATUS"
+
+      #       if [[ "$STATUS" == "SUCCESS" ]]; then
+      #         echo "✅ Build succeeded!"
+      #         exit 0
+      #       elif [[ "$STATUS" == "FAILURE" || "$STATUS" == "CANCELLED" || "$STATUS" == "TIMEOUT" ]]; then
+      #         echo "❌ Build failed with status: $STATUS"
+      #         exit 1
+      #       fi
+
+      #       echo "⏱ Sleeping for 20 seconds..."
+      #       sleep 20
+      #     done
+
+      #     echo "❌ Timed out waiting for build to finish."
+      #     exit 1
+
+      # - name: Submit Cloud Build using external file
+      #   run: |
+      #     gcloud builds submit \
+      #       --project=levomart \
+      #       --config=../k8s/auth/cloudBuild.yaml
+
+      # - name: Submit Cloud Build
+      #   run: |
+      #     gcloud builds submit auth \
+      #       --tag=asia-south1-docker.pkg.dev/levomart/levomart-repo/auth:$SHORT_SHA \
+      #       --project=levomart
+      - name: Echo Done
+        run: echo "Done with Auth Service CI/CD for Test Branch"

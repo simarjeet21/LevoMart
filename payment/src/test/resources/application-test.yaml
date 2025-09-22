@@ -1,0 +1,31 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+  h2:
+    console:
+      enabled: true
+spring.h2.console.enabled: true
+spring.h2.console.path: /h2-console
+# JPA Configuration
+
+# # Logging
+# logging.level.org.springframework.security=DEBUG
+# logging.level.com.auth.auth=DEBUG
+# logging.level.org.springframework.web=DEBUG
+
+# # Disable security for actuator endpoints in tests
+# management.endpoints.web.exposure.include=*
+# management.endpoint.health.show-details=always
+# application-test.yaml
+stripe:
+  webhook-secret: test-secret

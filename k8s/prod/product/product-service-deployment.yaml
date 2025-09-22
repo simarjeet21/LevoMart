@@ -1,0 +1,91 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: product-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: product
+  template:
+    metadata:
+      labels:
+        app: product
+    spec:
+      containers:
+        - name: product-container
+          image: asia-south1-docker.pkg.dev/levomart/levomart-repo/product:latest
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "256Mi"
+            limits:
+              cpu: "300m"
+              memory: "512Mi"
+          ports:
+            - containerPort: 4000
+          env:
+            - name: JWT_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: product-secret
+                  key: JWT_KEY
+
+            - name: MONGO_URI
+              valueFrom:
+                configMapKeyRef:
+                  name: product-config
+                  key: MONGO_URI
+
+            - name: PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: product-config
+                  key: PORT
+
+            - name: KAFKA_CLIENT_ID
+              valueFrom:
+                configMapKeyRef:
+                  name: product-config
+                  key: KAFKA_CLIENT_ID
+
+            - name: KAFKA_BROKERS_ADDRESS
+              valueFrom:
+                configMapKeyRef:
+                  name: product-config
+                  key: KAFKA_BROKERS_ADDRESS
+            - name: KAFKA_TOPIC_PRODUCT_CREATED_SCHEMA_PATH
+              valueFrom:
+                configMapKeyRef:
+                  name: product-config
+                  key: KAFKA_TOPIC_PRODUCT_CREATED_SCHEMA_PATH
+            - name: KAFKA_TOPIC_PRODUCT_UPDATED_SCHEMA_PATH
+              valueFrom:
+                configMapKeyRef:
+                  name: product-config
+                  key: KAFKA_TOPIC_PRODUCT_UPDATED_SCHEMA_PATH
+            - name: KAFKA_TOPIC_ORDER_CREATED_SCHEMA_PATH
+              valueFrom:
+                configMapKeyRef:
+                  name: product-config
+                  key: KAFKA_TOPIC_ORDER_CREATED_SCHEMA_PATH
+
+            - name: KAFKA_TOPIC_ORDER_UPDATED_SCHEMA_PATH
+              valueFrom:
+                configMapKeyRef:
+                  name: product-config
+                  key: KAFKA_TOPIC_ORDER_UPDATED_SCHEMA_PATH
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: product-service
+spec:
+  selector:
+    app: product
+  ports:
+    - name: product-service
+      protocol: TCP
+      port: 4000
+      targetPort: 4000

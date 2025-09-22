@@ -1,0 +1,125 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: order-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: order
+  template:
+    metadata:
+      labels:
+        app: order
+    spec:
+      containers:
+        - name: order-container
+          image: asia-south1-docker.pkg.dev/levomart/levomart-repo/orders:latest
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "256Mi"
+            limits:
+              cpu: "300m"
+              memory: "512Mi"
+
+          ports:
+            - containerPort: 4000
+          env:
+            - name: PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: order-config
+                  key: PORT
+
+            - name: DATABASE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: order-config
+                  key: DATABASE_URL
+
+            - name: TEST_EMAIL
+              valueFrom:
+                configMapKeyRef:
+                  name: order-config
+                  key: TEST_EMAIL
+
+            - name: KAFKA_CLIENT_ID
+              valueFrom:
+                configMapKeyRef:
+                  name: order-config
+                  key: KAFKA_CLIENT_ID
+
+            - name: KAFKA_BROKERS_ADDRESS
+              valueFrom:
+                configMapKeyRef:
+                  name: order-config
+                  key: KAFKA_BROKERS_ADDRESS
+
+            - name: KAFKA_TOPIC_ORDER_CREATED
+              valueFrom:
+                configMapKeyRef:
+                  name: order-config
+                  key: KAFKA_TOPIC_ORDER_CREATED
+
+            - name: KAFKA_TOPIC_ORDER_UPDATED
+              valueFrom:
+                configMapKeyRef:
+                  name: order-config
+                  key: KAFKA_TOPIC_ORDER_UPDATED
+
+            - name: KAFKA_TOPIC_ORDER_CREATED_SCHEMA_PATH
+              valueFrom:
+                configMapKeyRef:
+                  name: order-config
+                  key: KAFKA_TOPIC_ORDER_CREATED_SCHEMA_PATH
+
+            - name: KAFKA_TOPIC_ORDER_UPDATED_SCHEMA_PATH
+              valueFrom:
+                configMapKeyRef:
+                  name: order-config
+                  key: KAFKA_TOPIC_ORDER_UPDATED_SCHEMA_PATH
+
+            - name: KAFKA_TOPIC_PRODUCT_UPDATED_SCHEMA_PATH
+              valueFrom:
+                configMapKeyRef:
+                  name: order-config
+                  key: KAFKA_TOPIC_PRODUCT_UPDATED_SCHEMA_PATH
+
+            - name: KAFKA_TOPIC_PRODUCT_CREATED_SCHEMA_PATH
+              valueFrom:
+                configMapKeyRef:
+                  name: order-config
+                  key: KAFKA_TOPIC_PRODUCT_CREATED_SCHEMA_PATH
+
+            - name: KAFKA_TOPIC_PAYMENT_SUCCEEDED_SCHEMA_PATH
+              valueFrom:
+                configMapKeyRef:
+                  name: order-config
+                  key: KAFKA_TOPIC_PAYMENT_SUCCEEDED_SCHEMA_PATH
+
+            - name: KAFKA_TOPIC_PAYMENT_FAILED_SCHEMA_PATH
+              valueFrom:
+                configMapKeyRef:
+                  name: order-config
+                  key: KAFKA_TOPIC_PAYMENT_FAILED_SCHEMA_PATH
+
+            - name: JWT_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: order-secret
+                  key: JWT_KEY
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: order-service
+spec:
+  selector:
+    app: order
+  ports:
+    - name: order
+      protocol: TCP
+      port: 4000
+      targetPort: 4000

@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: payment-postgres-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: payment-postgres
+  template:
+    metadata:
+      labels:
+        app: payment-postgres
+    spec:
+      containers:
+        - name: payment-postgres
+          image: postgres
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "256Mi"
+            limits:
+              cpu: "300m"
+              memory: "512Mi"
+          env:
+            - name: POSTGRES_USER
+              value: postgres
+            - name: POSTGRES_PASSWORD
+              value: "5533"
+            - name: POSTGRES_DB
+              value: paymentDb
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: payment-postgres-service
+spec:
+  selector:
+    app: payment-postgres
+  ports:
+    - name: db
+      protocol: TCP
+      port: 5432
+      targetPort: 5432

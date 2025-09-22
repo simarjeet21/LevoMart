@@ -1,0 +1,150 @@
+Absolutely — here's a **complete and exhaustive list of test cases** for your **Product Service**, based on your route structure and standard REST/API/role practices.
+
+---
+
+## 🔁 OVERVIEW OF ROUTES
+
+### 👑 Admin Routes
+
+* `DELETE /api/admin/products/:id` – Delete any product
+* `GET /api/admin/products` – List all products
+
+<!-- - `PATCH /api/admin/products/:id/moderate` – Moderate product (commented) -->
+
+### 🛍️ Seller Routes
+
+* `POST /api/seller/products` – Create product
+* `DELETE /api/seller/products/:id` – Delete own product
+* `GET /api/seller/products` – List own products
+* `PATCH /api/seller/products/:id` – Update own product
+
+### 👤 User Routes
+
+* `GET /api/products` – List visible/active products
+* `GET /api/products/:id` – Show single product
+
+---
+
+## ✅ COMPREHENSIVE TEST CASE LIST (Organized by Role)
+
+---
+
+### 👑 ADMIN ROUTES
+
+#### 🔹 `GET /api/admin/products`
+
+* ✅ 200 returns all products
+* ❌ 401 unauthenticated
+* ❌ 403 non-admin
+* ✅ Filters inactive/flagged/blocked products if implemented
+
+#### 🔹 `DELETE /api/admin/products/:id`
+
+* ✅ 200 if product exists
+* ❌ 401 unauthenticated
+* ❌ 403 non-admin
+* ❌ 404 if product doesn’t exist
+* ❌ Invalid ID format
+* ✅ Soft delete or flag product if applicable
+
+#### 🔹 (Optional) `PATCH /api/admin/products/:id/moderate`
+
+> (Moderate listing: mark blocked, rejected, flagged)
+
+* ✅ 200 on success
+* ❌ 401 unauthenticated
+* ❌ 403 non-admin
+* ❌ 404 if product not found
+* ❌ 400 for invalid status/reason
+
+---
+
+### 🛍️ SELLER ROUTES
+
+#### 🔹 `POST /api/seller/products`
+
+* ✅ 201 on successful creation
+* ❌ 401 unauthenticated
+* ❌ 403 if not seller
+* ❌ 400 if required fields are missing (title, price, stock)
+* ❌ 400 for invalid price or stock (negative)
+* ❌ 400 for duplicate titles (if restricted)
+* ✅ Sanitization (e.g., no script tags)
+
+#### 🔹 `GET /api/seller/products`
+
+* ✅ 200 with list of seller's products
+* ❌ 401 unauthenticated
+* ❌ 403 if not seller
+
+#### 🔹 `PATCH /api/seller/products/:id`
+
+* ✅ 200 on successful update
+* ❌ 401 unauthenticated
+* ❌ 403 if not seller
+* ❌ 403 if seller does not own product
+* ❌ 400 for invalid body (price, stock, etc.)
+* ❌ 404 if product not found
+* ✅ Partial update works (e.g., only price)
+
+#### 🔹 `DELETE /api/seller/products/:id`
+
+* ✅ 200 on successful delete
+* ❌ 401 unauthenticated
+* ❌ 403 if not seller
+* ❌ 403 if not owner
+* ❌ 404 if product not found
+* ✅ Should ensure no active orders before deletion (optional)
+
+---
+
+### 👤 USER ROUTES
+
+#### 🔹 `GET /api/products`
+
+* ✅ 200 with public product list
+* ✅ Filters out blocked/inactive items
+* ✅ Includes pagination or sorting (if implemented)
+
+#### 🔹 `GET /api/products/:id`
+
+* ✅ 200 with product details
+* ❌ 404 if product doesn’t exist or blocked
+* ❌ Invalid ID format
+* ✅ Only returns if product is active
+
+---
+
+## ⚙️ ADVANCED/EDGE CASES (ALL ROUTES)
+
+* ❌ Invalid/malformed IDs (`/api/products/abc`)
+* ❌ Internal server error (simulate DB failure)
+* ❌ SQL constraint violations (e.g., FK errors)
+* ✅ Data sanitization (HTML/script injection)
+* ✅ Role-based access leak test (e.g., user trying admin route)
+* ❌ Race condition (two sellers try to update/delete same product)
+* ✅ Audit or versioning check (optional)
+* ✅ JSON schema validation (if enforced)
+
+---
+
+## ✅ TOTAL TEST CASES
+
+| Category      | Est. Tests |
+| ------------- | ---------- |
+| Admin Routes  | 10–12      |
+| Seller Routes | 15–18      |
+| User Routes   | 5–6        |
+| Edge Cases    | 6–8        |
+| **Total**     | **35–40**  |
+
+---
+
+## ✅ Let Me Know If You Want…
+
+* 🔧 Test file/folder structure suggestions
+* 🧪 Jest + Supertest template code
+* 🧱 Database mocking (with Prisma)
+* 🧠 Role-based mocking utility functions
+
+You're on the right path — with these tests, your service will be rock solid and production-grade.
